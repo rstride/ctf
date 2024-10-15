@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Users</title>
+</head>
+<body>
+    <h1>Search Results</h1>
+    {% if result %}
+        <ul>
+            {% for row in result %}
+                <li>{{ row }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+</body>
+</html>
