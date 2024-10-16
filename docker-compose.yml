@@ -2,7 +2,7 @@ services:
   wordpress:
     build: ./wordpress
     ports:
-      - "8081:80"
+      - "8081:81"
     volumes:
       - ./wordpress/wp-content:/var/www/html/wp-content
     environment:
@@ -32,6 +32,12 @@ services:
     build: ./calc-challenge
     ports:
       - "5001:5001"
+  lost-last:
+    build: ./loSt-last
+    ports:
+      - "5002:5002"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock 
 
 volumes:
   db_data:

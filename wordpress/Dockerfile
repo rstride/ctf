@@ -10,4 +10,4 @@ RUN wget https://downloads.wordpress.org/plugin/wp-file-manager.6.0.zip -P /tmp/
 # Set permissions
 RUN chown -R www-data:www-data /usr/src/wordpress/wp-content/plugins/
 
-EXPOSE 80
+EXPOSE 81

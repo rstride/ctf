@@ -2,11 +2,9 @@ FROM python:3.8-slim
 
 WORKDIR /app
 
-COPY requirements.txt /app/
+COPY . /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py /app/
-
-EXPOSE 5000
+EXPOSE 5001
 
 CMD ["python", "app.py"]

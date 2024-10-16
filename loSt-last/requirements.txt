@@ -1,0 +1,6 @@
+flask
+flask_wtf
+rivescript
+scapy
+flask_socketio
+docker
