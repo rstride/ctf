@@ -1,4 +1,30 @@
 services:
+  ctfd :
+    build: ./CTFd
+    environment:
+    - SECRET_KEY=./CTFd/.ctfd_secret
+    - UPLOAD_FOLDER=/var/uploads
+    - LOG_FOLDER=/var/log/CTFd
+    - DATABASE_URL=mysql+pymysql://root:ctfd@db/ctfd
+    - REDIS_URL=redis://cache:6379
+    - WORKERS=4
+    ports: 
+    - 8000:8000
+    volumes:
+    - ./CTFd:/var/uploads
+    depends_on:
+    - ctfd_db
+
+  ctfd_db:
+    image: mysql:5.7
+    environment:
+    - MYSQL_ROOT_PASSWORD=ctfd
+    - MYSQL_DATABASE=ctfd
+    - MYSQL_USER=ctfd
+    - MYSQL_PASSWORD=ctfd
+    volumes:
+    - ./CTFd/mysql:/var/lib/mysql
+
   wordpress:
     build: ./wordpress
     ports:
@@ -11,10 +37,10 @@ services:
       WORDPRESS_DB_PASSWORD: wordpresspass
       WORDPRESS_DB_NAME: wordpress
     depends_on:
-      - db
+      - wordpress_db
 
-  db:
-    image: mysql:5.7
+  wordpress_db:
+    image: mysql
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: wordpress
@@ -32,12 +58,6 @@ services:
     build: ./calc-challenge
     ports:
       - "5001:5001"
-  lost-last:
-    build: ./loSt-last
-    ports:
-      - "5002:5002"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock 
 
 volumes:
   db_data:
