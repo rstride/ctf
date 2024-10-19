@@ -5,4 +5,4 @@ RUN [ -f /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/defau
 
 # Copy your custom nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
-
+COPY certs/ /etc/nginx/certs/

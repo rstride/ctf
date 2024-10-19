@@ -162,3 +162,7 @@ cython_debug/
 #.idea/
 
 .data/
+data/
+nginx/certs/ctf_fullchain.pem
+nginx/certs/ctf_privkey.pem
+transcendence/
