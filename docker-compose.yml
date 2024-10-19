@@ -1,29 +1,63 @@
 services:
-  ctfd :
-    build: ./CTFd
+  ctfd:
+    image: ctfd/ctfd:latest
+    user: root
+    restart: always
+    ports:
+      - "8000:8000"
     environment:
-    - SECRET_KEY=./CTFd/.ctfd_secret
-    - UPLOAD_FOLDER=/var/uploads
-    - LOG_FOLDER=/var/log/CTFd
-    - DATABASE_URL=mysql+pymysql://root:ctfd@db/ctfd
-    - REDIS_URL=redis://cache:6379
-    - WORKERS=4
-    ports: 
-    - 8000:8000
+      - UPLOAD_FOLDER=/var/uploads
+      - DATABASE_URL=mysql+pymysql://ctfd:ctfd@db/ctfd
+      - REDIS_URL=redis://cache:6379
+      - WORKERS=1
+      - LOG_FOLDER=/var/log/CTFd
+      - ACCESS_LOG=-
+      - ERROR_LOG=-
+      - REVERSE_PROXY=true
     volumes:
-    - ./CTFd:/var/uploads
+      - .data/CTFd/logs:/var/log/CTFd
+      - .data/CTFd/uploads:/var/uploads
     depends_on:
-    - ctfd_db
+      - db
+    networks:
+      - default
+      - internal
 
-  ctfd_db:
-    image: mysql:5.7
-    environment:
-    - MYSQL_ROOT_PASSWORD=ctfd
-    - MYSQL_DATABASE=ctfd
-    - MYSQL_USER=ctfd
-    - MYSQL_PASSWORD=ctfd
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - ctfd
     volumes:
-    - ./CTFd/mysql:/var/lib/mysql
+      - ./nginx/certs:/etc/nginx/certs
+    restart: unless-stopped
+
+  db:
+    image: mariadb:10.11
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=ctfd
+      - MARIADB_USER=ctfd
+      - MARIADB_PASSWORD=ctfd
+      - MARIADB_DATABASE=ctfd
+      - MARIADB_AUTO_UPGRADE=1
+    volumes:
+      - .data/mysql:/var/lib/mysql
+    networks:
+      - internal
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci, --wait_timeout=28800, --log-warnings=0]
+
+  cache:
+    image: redis:4
+    restart: always
+    volumes:
+      - .data/redis:/data
+    networks:
+      - internal
 
   wordpress:
     build: ./wordpress
@@ -37,27 +71,40 @@ services:
       WORDPRESS_DB_PASSWORD: wordpresspass
       WORDPRESS_DB_NAME: wordpress
     depends_on:
-      - wordpress_db
+      - db
+    networks:
+      - internal
 
   wordpress_db:
     image: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpressuser
-      MYSQL_PASSWORD: wordpresspass
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpressuser
+      - MYSQL_PASSWORD=wordpresspass
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - internal
 
   django-sqli:
     build: ./django-sqli
     ports:
       - "8001:8001"
+    networks:
+      - default
 
   calc-challenge:
     build: ./calc-challenge
     ports:
       - "5001:5001"
+    networks:
+      - default
 
 volumes:
   db_data:
+
+networks:
+  default:
+  internal:
+    internal: true
