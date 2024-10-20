@@ -1,7 +1,7 @@
 all: build
 
 up:
-	docker-compose up -d
+	docker compose up -d
 
 build:
 	docker compose up -d --build
@@ -13,13 +13,31 @@ down:
 	docker compose down
 
 clean: down
-	docker rmi -f $$(docker images -q)
-	
+	# Remove all images except base images (python, nginx, etc.)
+	docker rmi -f $(docker images -f "dangling=true" -q)
+
 fclean: down
-	docker system prune -a -f
+	# Remove everything (containers, volumes, networks)
+	docker system prune -a -f --volumes
 
 re: fclean all
 
 r: down up
 
-PHONY: all up build migrate down clean fclean re r
+# New Targets
+
+# Rebuild a Specific Service
+rebuild-%:
+	docker compose up -d --build $*
+
+# Restart a Specific Service
+restart-%:
+	docker compose restart $*
+
+# Stop and Remove a Specific Service
+down-%:
+	docker compose stop $* && docker compose rm -f $*
+
+re-%: down-% rebuild-%
+
+PHONY: all up build migrate down clean fclean re r rebuild-% restart-% down-% re-%
