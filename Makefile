@@ -22,7 +22,7 @@ fclean: down
 
 re: fclean all
 
-r: down up
+r: down build
 
 # New Targets
 
