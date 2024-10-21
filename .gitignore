@@ -163,6 +163,5 @@ cython_debug/
 
 .data/
 data/
-nginx/certs/ctf_fullchain.pem
-nginx/certs/ctf_privkey.pem
+nginx/
 transcendence/

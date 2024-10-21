@@ -52,7 +52,7 @@ services:
     container_name: transcendence_db
     env_file: .env
     volumes:
-      - ./data/transcendence_db:/var/lib/postgresql/data
+      - .data/transcendence_db:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
       - default
@@ -75,6 +75,9 @@ services:
     build: ./django
     ports:
       - "6001:80"
+    env_file: .env
+    volumes:
+      - ./django:/django
     networks:
       - default
 
@@ -82,6 +85,19 @@ services:
     build: ./programming
     ports:
       - "6002:80"
+    networks:
+      - default
+  
+  wordpress:
+    image: wordpress:latest
+    restart: always
+    ports:
+      - "6003:80"
+    environment:
+      WORDPRESS_DB_HOST: wordpress_db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
     networks:
       - default
 
