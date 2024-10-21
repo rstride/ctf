@@ -14,7 +14,7 @@ def vulnerable_login(request):
             user = cursor.fetchone()
 
         if user:
-            return HttpResponse("Login successful! Flag: FLAG{SQL_INJECTION_SUCCESS}")
+            return HttpResponse("Login successful! Flag: flag{Dj4ngoIsB4d}")
         else:
             return HttpResponse("Login failed.")
     

@@ -1,12 +1,14 @@
 services:
   ctfd:
-    image: ctfd/ctfd:latest
+    build: 
+      context: ./CTFd
     user: root
     restart: always
     env_file: .env
     volumes:
       - .data/CTFd/logs:/var/log/CTFd
       - .data/CTFd/uploads:/var/uploads
+      - ./CTFd:/opt/CTFd
     depends_on:
       - mariadb
     networks:
